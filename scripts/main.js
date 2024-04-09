@@ -37,11 +37,13 @@ var frames = {
 
 /** ###### GLOBAL VARIABLES ###### **/
 let buttons = []; // Array to hold buttons
-let players = [new Player(1), new Player(2)];
+let players = [new Player(1, 'red'), new Player(2, 'green')];
 let currentPage = null;
 let pages = {}; // Object to hold pages by name
 let voteMap = {}; //Object to hold player votes
 let controlledPlayerIndex = 0;  // Only for development purposes. Controls player wrist with cursor
+const WRIST_LEFT_INDEX = 7;
+const WRIST_RIGHT_INDEX = 14;
 
 function getWristPositions(person) {
     // Placeholder implementation

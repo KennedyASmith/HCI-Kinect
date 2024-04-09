@@ -5,9 +5,12 @@ class Player {
     rippleStartTime = 0;
     finalRippleSize = 50; // Maximum size of the ripple
     rippleDuration = 500; // Duration of the ripple effect in milliseconds
+    WRIST_LEFT_INDEX = 7;
+    WRIST_RIGHT_INDEX = 14;
 
-    constructor(id) {
+    constructor(id, color) {
         this.id = id;
+        this.color = color;
         this.leftWrist = { x: 0, y: 0, valid: false, active: true, hoverStartTime: null };
         this.rightWrist = { x: 0, y: 0, valid: false, active: true, hoverStartTime: null };
         this.hoveredButton = null; // Tracks the currently hovered button
@@ -17,8 +20,8 @@ class Player {
     }
 
     updateJoints(joints) {
-        const leftWrist = joints.find(joint => joint.id === WRIST_LEFT_INDEX);
-        const rightWrist = joints.find(joint => joint.id === WRIST_RIGHT_INDEX);
+        const leftWrist = joints.find(joint => joint.id === this.WRIST_LEFT_INDEX);
+        const rightWrist = joints.find(joint => joint.id === this.WRIST_RIGHT_INDEX);
 
         if (leftWrist && leftWrist.valid) {
             this.leftWrist = { ...leftWrist.position, valid: true };
@@ -45,7 +48,7 @@ class Player {
 
     drawVote(s) {
         if (this.hasVoted && this.votePosition) {
-            s.fill(0, 0, 255); // Blue color for the vote, change as needed
+            s.fill(this.color);
             s.noStroke();
             s.ellipse(this.votePosition.x, this.votePosition.y, 20); // Draw a circle at the vote position
         }
@@ -178,7 +181,7 @@ class Player {
             let active = this.leftWrist.active;
 
             if(active){
-                s.fill('red');
+                s.fill(this.color);
             }else {
                 s.fill(20, 20, 20, 127);
             }
@@ -197,12 +200,18 @@ class Player {
         // Draw right wrist cursor if valid
         if (this.rightWrist.valid) {
             if(this.leftWrist.active){
-                s.fill('red');
+                s.fill(this.color);
             }else {
                 s.fill(20, 20, 20, 127);
             }
             s.ellipse(this.rightWrist.x, this.rightWrist.y, this.cursorSize);
-            s.fill('white');
+
+            if(active){
+                s.fill('white');
+            }else {
+                s.fill (0, 0, 0, 127)
+            }
+            
             s.text(`P${this.id}R`, this.rightWrist.x, this.rightWrist.y);
         }
     }
