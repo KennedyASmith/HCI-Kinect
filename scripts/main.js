@@ -1,6 +1,7 @@
-import { Player } from "./players.js";
-import { Button } from "./buttons.js";
-import { Page } from "./page.js";
+import { Player } from "./Player.js";
+import { Button } from "./Button.js";
+import { Page } from "./Page.js";
+import { StatusDisplay } from './StatusDisplay.js'; 
 
 import p5 from 'https://cdn.skypack.dev/p5';
 
@@ -39,6 +40,7 @@ let buttons = []; // Array to hold buttons
 let players = [new Player(1), new Player(2), /* ADDING THIRD PLAYER FOR TESTING */ new Player(3)];
 let currentPage = null;
 let pages = {}; // Object to hold pages by name
+let voteMap = {}; //Object to hold player votes
 
 function getWristPositions(person) {
     // Placeholder implementation
@@ -86,6 +88,20 @@ function setCurrentPage(pageName) {
     if (pages[pageName]) {
         currentPage = pages[pageName];
         loadButtons(currentPage.buttons);
+    }
+}
+
+function checkAllPlayersVoted(players, voteMap, questionId, nextScreen) {
+    let allVoted = players.every(player => player.hasVoted);
+    if (allVoted) {
+        // Record each player's vote in the map
+        voteMap[questionId] = {};
+        players.forEach(player => {
+            voteMap[questionId][player.id] = player.vote;
+        });
+
+        // Proceed to the next screen
+        setCurrentPage(nextScreen);
     }
 }
 
@@ -147,6 +163,8 @@ function setupHomePage(s) {
 
 function setupInstructionsPage(s, players) {
     let instructionsPage = new Page('Instructions');
+    let questionId = "instructions";
+    let nextScreen = "question2";
 
     // Define the positions and sizes for the buttons
     let buttonWidth = 100;
@@ -156,20 +174,30 @@ function setupInstructionsPage(s, players) {
     let buttonB_X = 3 * s.width / 4 - buttonWidth / 2;
     let buttonB_Y = buttonA_Y;
 
+
     // Create buttons for Option A and Option B
     let optionA = new Button(buttonA_X, buttonA_Y, buttonWidth, buttonHeight, 'Option A', true, (playerWhoClicked, x, y) => {
-        playerWhoClicked.castVote(x, y);
+        playerWhoClicked.castVote("Option 1", x, y);
+        checkAllPlayersVoted(players, voteMap, questionId, nextScreen);
     });
 
     let optionB = new Button(buttonB_X, buttonB_Y, buttonWidth, buttonHeight, 'Option B', true, (playerWhoClicked, x, y) => {
-        playerWhoClicked.castVote(x, y);
+        playerWhoClicked.castVote("Option 2", x, y);
+        checkAllPlayersVoted(players, voteMap, questionId, nextScreen);
     });
 
     // Add buttons to the instructions page
     instructionsPage.addButton(optionA);
     instructionsPage.addButton(optionB);
 
-    return instructionsPage;
+    if (players) {
+        let statusDisplay = new StatusDisplay(players);
+        instructionsPage.addNewElement(statusDisplay);
+    } else {
+        console.error("Players array is undefined.");
+    }
+    return instructionsPage
+    ;
 }
 
 /** ###### CANVAS SETUP ###### **/
@@ -188,7 +216,7 @@ const sketch = (s) => {
 
         // Setup pages
         pages['home'] = setupHomePage(s); // Pass `s` when calling
-        pages['instructions'] = setupInstructionsPage(s); // Pass `s` when calling
+        pages['instructions'] = setupInstructionsPage(s, players); // Pass `s` when calling
 
         // Set "Home" as the default/first page
         setCurrentPage('home');

@@ -13,6 +13,7 @@ class Player {
         this.hoveredButton = null; // Tracks the currently hovered button
         this.hasVoted = false;
         this.votePosition = null;
+        this.vote = null;
     }
 
     updateJoints(joints) {
@@ -32,9 +33,10 @@ class Player {
         }
     }
     // Call this method when the player casts a vote
-    castVote(x, y) {
+    castVote(voteOption, x, y) {
         if (!this.hasVoted) {
             this.hasVoted = true;
+            this.vote = voteOption;
             this.votePosition = { x, y };
             this.leftWrist.active = false;  // Assuming the left wrist is used for voting
             this.rightWrist.active = false;  // Assuming the left wrist is used for voting
