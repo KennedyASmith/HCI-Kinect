@@ -37,10 +37,11 @@ var frames = {
 
 /** ###### GLOBAL VARIABLES ###### **/
 let buttons = []; // Array to hold buttons
-let players = [new Player(1), new Player(2), /* ADDING THIRD PLAYER FOR TESTING */ new Player(3)];
+let players = [new Player(1), new Player(2)];
 let currentPage = null;
 let pages = {}; // Object to hold pages by name
 let voteMap = {}; //Object to hold player votes
+let controlledPlayerIndex = 0;  // Only for development purposes. Controls player wrist with cursor
 
 function getWristPositions(person) {
     // Placeholder implementation
@@ -226,9 +227,27 @@ const sketch = (s) => {
 
         s.background(200); // Example: gray background
 
-        // DEVELOPMENT PURPOSES (Mouse cursor): Update Player 3's position with the mouse position each frame
-        const player3 = players[2]; 
-        player3.updateWithMouse(s);
+        /** ############# CURSOR (DEVELOPMENT ONLY) ############# */
+        players[controlledPlayerIndex].leftWrist.valid = true;
+
+        s.keyPressed = () => {
+            if (s.key === '1') {
+                controlledPlayerIndex = 0;  // Cursor controls player 1
+            } else if (s.key === '2') {
+                
+                controlledPlayerIndex = 1;  // Cursor controls player 2
+            }
+        };
+        
+        s.mouseMoved = () => {
+            // Update the position of the controlled player's left wrist with the mouse
+            if (players[controlledPlayerIndex]) {
+                players[controlledPlayerIndex].leftWrist.x = s.mouseX;
+                players[controlledPlayerIndex].leftWrist.y = s.mouseY;
+            }
+        };
+        /** ############# ######################### ############# */
+    
 
         // Draw the current page and its elements
         if (currentPage) {

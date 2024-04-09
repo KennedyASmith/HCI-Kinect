@@ -69,7 +69,6 @@ class Player {
         }
     }
 
-
     // Check for hover over a button and update hover state
     checkHover(buttons, s) {
 
